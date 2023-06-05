@@ -2,22 +2,18 @@ import scala.util.Random
 
 object Cards:
   enum Color:
-    case Diamond, Heart, Club, Spade
+    case Spade, Club, Heart, Diamond
   object Color:
     given Ordering[Color] with
       def compare(x: Color, y: Color): Int = x.ordinal compare y.ordinal
 
-    val colors = List(Color.Diamond, Color.Heart, Color.Club, Color.Spade)
-
   enum Rank:
-    case Numeric(value: Int)
-    case Jack, Queen, King, Joker
+    case Two, Three, For, Fives, Six, Seven, Eight, Nine, Ten, Jack, Queen,
+      King, Ace, Joker
   object Rank:
     given Ordering[Rank] with
-      def compare(x: Rank, y: Rank): Int = x.ordinal compare y.ordinal
-
-    val ranks = (2 to 10).toList.map(Rank.Numeric(_))
-      ::: List(Rank.Jack, Rank.Queen, Rank.King)
+      def compare(x: Rank, y: Rank): Int =
+        x.ordinal compare y.ordinal
 
   case class Card(rank: Rank, color: Color)
   object Card:
@@ -29,13 +25,15 @@ object Cards:
         if rankDiff == 0 then colorDiff
         else rankDiff
 
-  val jokers =
-    List(Card(Rank.Joker, Color.Diamond), Card(Rank.Joker, Color.Club))
+  val redJoker = Card(Rank.Joker, Color.Diamond)
+  val blackJoker = Card(Rank.Joker, Color.Club)
 
-  def deck: List[Card] =
-    for
-      rank <- Rank.ranks
-      color <- Color.colors
-    yield Card(rank, color)
+  val deck: List[Card] =
+    (for
+      rank <- Rank.values.filterNot(_ == Rank.Joker)
+      color <- Color.values
+    yield Card(rank, color)).toList
 
-  def shuffledDeck: List[Card] = Random.shuffle(deck)
+  val deckWithJokers: List[Card] = redJoker :: blackJoker :: deck
+
+  extension (deck: List[Card]) def shuffled: List[Card] = Random.shuffle(deck)

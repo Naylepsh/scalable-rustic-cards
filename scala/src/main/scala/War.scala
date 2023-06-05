@@ -93,6 +93,6 @@ object War:
     yield winner.id
 
   def run(roundCap: Int) =
-    distributeCards(shuffledDeck)
+    distributeCards(deckWithJokers.shuffled)
       .andThen(playGame(_, roundCap))
       .andThen(determineWinner)
