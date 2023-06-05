@@ -19,18 +19,18 @@ object Cards:
   object Card:
     given Ordering[Card] with
       def compare(x: Card, y: Card): Int =
-        val rankDiff = x.rank.ordinal compare y.rank.ordinal
+        val rankDiff  = x.rank.ordinal compare y.rank.ordinal
         val colorDiff = x.color.ordinal compare y.color.ordinal
 
         if rankDiff == 0 then colorDiff
         else rankDiff
 
-  val redJoker = Card(Rank.Joker, Color.Diamond)
+  val redJoker   = Card(Rank.Joker, Color.Diamond)
   val blackJoker = Card(Rank.Joker, Color.Club)
 
   val deck: List[Card] =
     (for
-      rank <- Rank.values.filterNot(_ == Rank.Joker)
+      rank  <- Rank.values.filterNot(_ == Rank.Joker)
       color <- Color.values
     yield Card(rank, color)).toList
 

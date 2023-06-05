@@ -1,5 +1,6 @@
-import Cards.{*, given}
 import scala.util.Random
+
+import Cards.{ *, given }
 import cats.data.NonEmptyList
 import cats.syntax.all.*
 
@@ -19,7 +20,7 @@ object War:
     val groups = deck.grouped(players.length).toArray
     if groups.length == players.length + 1 then
       val leftoverCards = groups(players.length)
-      val playerIds = 1 to players.length
+      val playerIds     = 1 to players.length
       Random
         .shuffle(playerIds)
         .zip(leftoverCards)
@@ -29,9 +30,9 @@ object War:
       .zip(NonEmptyList.fromListUnsafe(groups.toList))
       .map(PlayerState(_, _))
 
-  type Players[A] = NonEmptyList[PlayerState[A]]
+  type Players[A]   = NonEmptyList[PlayerState[A]]
   type CardsOnStake = List[Card]
-  type Winner[A] = A
+  type Winner[A]    = A
 
   private case class CardOnTable[A](
       thrownBy: A,
@@ -45,8 +46,9 @@ object War:
       player.drawCard match
         case (Some(card), state) => (Some(player.id, card), state)
         case (None, state)       => (None, state)
-    playerMoves.map(_._1).collect { case Some(id, card) =>
-      CardOnTable(id, card)
+    playerMoves.map(_._1).collect {
+      case Some(id, card) =>
+        CardOnTable(id, card)
     } match
       case Nil         => None
       case head :: Nil => None

@@ -1,13 +1,13 @@
-import munit.ScalaCheckSuite
-import org.scalacheck.Prop._
+import Cards.{ *, given }
 import OrphanInstances.given
-import Cards.{*, given}
 import War.*
-import org.scalacheck.Gen
-import cats.implicits.*
 import cats.data.NonEmptyList
+import cats.implicits.*
+import munit.ScalaCheckSuite
+import org.scalacheck.Gen
+import org.scalacheck.Prop.*
 
-class WarSuite extends ScalaCheckSuite {
+class WarSuite extends ScalaCheckSuite:
   val deckGen = Gen.oneOf(1 to 1).map(_ => deck.shuffled)
 
   property(
@@ -24,4 +24,3 @@ class WarSuite extends ScalaCheckSuite {
       assert(1 <= cardCounts.size || cardCounts.size <= 2)
     }
   }
-}
