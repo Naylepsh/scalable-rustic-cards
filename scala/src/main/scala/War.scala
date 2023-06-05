@@ -17,10 +17,12 @@ object War:
   def distributeCards[A](deck: List[Card])(
       players: NonEmptyList[A]
   ): NonEmptyList[PlayerState[A]] =
-    val groups = deck.grouped(deck.length / players.length).toArray
+    val minCardCountPerPlayer =
+      (deck.length.toDouble / players.length).ceil.toInt
+    val groups = deck.grouped(minCardCountPerPlayer).toArray
     if groups.length == players.length + 1 then
       val leftoverCards = groups(players.length)
-      val playerIds     = 0 to players.length
+      val playerIds     = 0 until players.length
       Random
         .shuffle(playerIds)
         .zip(leftoverCards)
@@ -47,8 +49,7 @@ object War:
         case (Some(card), state) => (Some(player.id, card), state)
         case (None, state)       => (None, state)
     playerMoves.map(_._1).collect {
-      case Some(id, card) =>
-        CardOnTable(id, card)
+      case Some(id, card) => CardOnTable(id, card)
     } match
       case Nil         => None
       case head :: Nil => None
