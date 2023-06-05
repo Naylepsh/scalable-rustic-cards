@@ -8,14 +8,17 @@ import org.scalacheck.Gen
 import org.scalacheck.Prop.*
 
 class WarSuite extends ScalaCheckSuite:
+  given playersGen: Gen[NonEmptyList[Int]] = Gen.choose(1, deck.length).map:
+    playerCount =>
+      NonEmptyList.fromListUnsafe((1 to playerCount).toList)
+
   property(
     "Cards are distributed between players such that no player has more than 1 card over any other"
   ) {
-    forAll(Gen.const(deck), Gen.choose(2, 10)) {
-      (cards: List[Card], playerCount: Int) =>
-        (cards.length == 52 && playerCount > 0) ==> {
-          val playerIds = NonEmptyList.fromListUnsafe((1 to playerCount).toList)
-          val cardCounts = distributeCards(cards)(playerIds)
+    forAll(Gen.const(deck), playersGen) {
+      (cards: List[Card], players: NonEmptyList[Int]) =>
+        (cards.length == 52 && players.length > 0) ==> {
+          val cardCounts = distributeCards(cards)(players)
             .map(_.cards.length)
             .toList
             .toSet
@@ -26,11 +29,10 @@ class WarSuite extends ScalaCheckSuite:
   }
 
   property("All cards are distributed among the players") {
-    forAll(Gen.const(deck), Gen.choose(4, 12)) {
-      (cards: List[Card], playerCount: Int) =>
-        (cards.length == 52 && playerCount > 0) ==> {
-          val playerIds = NonEmptyList.fromListUnsafe((1 to playerCount).toList)
-          val totalCardCount = distributeCards(cards)(playerIds)
+    forAll(Gen.const(deck), playersGen) {
+      (cards: List[Card], players: NonEmptyList[Int]) =>
+        (cards.length == 52 && players.length > 0) ==> {
+          val totalCardCount = distributeCards(cards)(players)
             .map(_.cards.length)
             .foldLeft(0)(_ + _)
 
