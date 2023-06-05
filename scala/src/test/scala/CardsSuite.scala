@@ -1,16 +1,14 @@
-import munit.ScalaCheckSuite
-import org.scalacheck.Prop._
+import Cards.{ *, given }
 import OrphanInstances.given
-import Cards.{*, given}
+import munit.ScalaCheckSuite
 import org.scalacheck.Gen
+import org.scalacheck.Prop.*
 
-class CardsSuite extends ScalaCheckSuite {
+class CardsSuite extends ScalaCheckSuite:
   val `2ofSpade` = Card(Rank.Two, Color.Spade)
 
   property("Red joker is the most valuable card in the deck") {
-    forAll { (card: Card) =>
-      assertEquals(List(card, redJoker).max, redJoker)
-    }
+    forAll { (card: Card) => assertEquals(List(card, redJoker).max, redJoker) }
   }
 
   property("2 of Spade is the least valuable card in the deck") {
@@ -30,4 +28,3 @@ class CardsSuite extends ScalaCheckSuite {
       assertEquals(deck.length, 54)
     }
   }
-}
