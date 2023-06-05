@@ -17,10 +17,10 @@ object War:
   def distributeCards[A](deck: List[Card])(
       players: NonEmptyList[A]
   ): NonEmptyList[PlayerState[A]] =
-    val groups = deck.grouped(players.length).toArray
+    val groups = deck.grouped(deck.length / players.length).toArray
     if groups.length == players.length + 1 then
       val leftoverCards = groups(players.length)
-      val playerIds     = 1 to players.length
+      val playerIds     = 0 to players.length
       Random
         .shuffle(playerIds)
         .zip(leftoverCards)
@@ -63,6 +63,9 @@ object War:
               .map: winner =>
                 (newState, winner.thrownBy, cardsOnTable.map(_.card))
 
+  private def debugState[*](players: Players[*]): Unit =
+    println(s"${players.map(player => (player.id, player.cards.length))}")
+
   @annotation.tailrec
   def playGame[A](players: Players[A], roundsLeft: Int): Players[A] =
     if roundsLeft == 0 then players
@@ -75,7 +78,7 @@ object War:
               PlayerState(winner, cards ::: cardsOnStake)
             case player => player
           }
-          println(s"${players.map(player => (player.id, player.cards.length))}")
+          debugState(players)
           playGame(newstate, roundsLeft - 1)
 
   private case class PlayerSummary[A](
@@ -85,6 +88,7 @@ object War:
     val cardsWonCount = cardsWon.length
 
   def determineWinner[A](players: Players[A]): Option[A] =
+    debugState(players)
     val summary = players.map: player =>
       PlayerSummary(player.id, player.cards)
     val mostCardsWon = summary.map(_.cardsWonCount).maximum

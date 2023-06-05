@@ -15,12 +15,27 @@ class WarSuite extends ScalaCheckSuite:
   ) {
     forAll(deckGen, Gen.choose(2, 10)) { (deck: List[Card], playerCount: Int) =>
       val playerIds = NonEmptyList.fromListUnsafe((1 to playerCount).toList)
-      val cardCounts =
-        distributeCards(deck)(playerIds)
-          .map(_.cards.length)
-          .toList
-          .toSet
+      val cardCounts = distributeCards(deck)(playerIds)
+        .map(_.cards.length)
+        .toList
+        .toSet
 
       assert(1 <= cardCounts.size || cardCounts.size <= 2)
+    }
+  }
+
+  property(
+    "All cards are distributed among the players"
+  ) {
+    forAll(deckGen, Gen.choose(2, 10)) {
+      (cards: List[Card], playerCount: Int) =>
+        if cards.length > 0 && playerCount > 1 && playerCount < cards.length
+        then
+          val playerIds = NonEmptyList.fromListUnsafe((1 to playerCount).toList)
+          val totalCardCount = distributeCards(cards)(playerIds)
+            .map(_.cards.length)
+            .foldLeft(0)(_ + _)
+
+          assertEquals(totalCardCount, deck.length)
     }
   }
