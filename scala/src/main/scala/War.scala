@@ -19,8 +19,9 @@ object War:
   ): NonEmptyList[PlayerState[A]] =
     val minCardCountPerPlayer =
       (deck.length.toDouble / players.length).ceil.toInt
-    val groups = deck.grouped(minCardCountPerPlayer).toArray
-    if groups.length == players.length + 1 then
+    val groups                    = deck.grouped(minCardCountPerPlayer).toArray
+    val cantDistributeCardsEvenly = groups.length == players.length + 1
+    if cantDistributeCardsEvenly then
       val leftoverCards = groups(players.length)
       val playerIds     = 0 until players.length
       Random
@@ -51,8 +52,8 @@ object War:
     playerMoves.map(_._1).collect {
       case Some(id, card) => CardOnTable(id, card)
     } match
-      case Nil         => None
-      case head :: Nil => None
+      case Nil      => None
+      case _ :: Nil => None
       case cardsOnTable =>
         val newState = playerMoves.map(_._2)
 
